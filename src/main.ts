@@ -1,25 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 async function bootstrap() {
   // Buat instance HTTP server
   const app = await NestFactory.create(AppModule);
+  const brokers = process.env.KAFKA_BROKERS.split(',').map((broker) =>
+    broker.trim(),
+  );
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
     options: {
       client: {
-        brokers: [
-          'b-2.democluster1.kw4wm2.c3.kafka.ap-southeast-1.amazonaws.com:9098',
-          'b-1.democluster1.kw4wm2.c3.kafka.ap-southeast-1.amazonaws.com:9098',
-          'b-3.democluster1.kw4wm2.c3.kafka.ap-southeast-1.amazonaws.com:9098',
-        ],
+        brokers: brokers,
         ssl: true, // Pastikan SSL diaktifkan
         sasl: {
-          mechanism: 'scram-sha-256',
-          username: 'imamalarisyi',
-          password: 'Lamb0fGod!',
+          mechanism: 'scram-sha-512', // atau 'plain' tergantung konfigurasi MSK
+          username: process.env.AWS_ACCESS_KEY,
+          password: process.env.AWS_SECRET_KEY,
         },
       },
       consumer: {
