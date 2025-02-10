@@ -9,7 +9,6 @@ export class AwsService {
   private readonly s3Client: S3Client;
 
   constructor() {
-    // Inisialisasi S3Client dengan konfigurasi region dan credentials
     this.s3Client = new S3Client({
       region: process.env.AWS_REGION,
       credentials: {
